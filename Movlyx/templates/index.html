@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movlyx - Explore Cinema</title>
+    <style>
+        :root { --main-red: #f43f5e; --dark-blue: #032c56; --glass: rgba(255, 255, 255, 0.1); }
+        
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background: var(--dark-blue); color: white; overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar { 
+            background: rgba(0,0,0,0.5); padding: 15px 5%; 
+            display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 28px; font-weight: 900; color: var(--main-red); text-decoration: none; letter-spacing: -1px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: 600; font-size: 14px; }
+        .fav-link { background: var(--main-red); padding: 8px 18px; border-radius: 20px; }
+
+        /* Hero Header */
+        header { text-align: center; padding: 40px 20px; }
+        header h1 { font-size: 60px; margin: 0; color: var(--main-red); text-transform: uppercase; }
+
+        .container { max-width: 1200px; margin: auto; padding: 20px; }
+
+        /* Search & Filter Section */
+        .control-panel { 
+            background: var(--glass); padding: 30px; border-radius: 25px; 
+            margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .search-form { 
+            display: flex; background: white; border-radius: 35px; 
+            padding: 5px; max-width: 600px; margin: 0 auto 25px; 
+        }
+        .search-form input { 
+            flex: 1; border: none; padding: 12px 25px; border-radius: 35px; outline: none; font-size: 16px; 
+        }
+        .search-form button { 
+            background: var(--main-red); color: white; border: none; 
+            padding: 12px 30px; border-radius: 30px; cursor: pointer; font-weight: bold;
+        }
+
+        .filters { 
+            display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: flex-end; 
+        }
+        .f-group { display: flex; flex-direction: column; gap: 5px; }
+        .f-group label { font-size: 12px; font-weight: bold; opacity: 0.8; margin-left: 5px; }
+        .f-group select, .f-group input { 
+            padding: 10px 15px; border-radius: 12px; border: none; background: white; color: #333; outline: none;
+        }
+
+        .btn-apply { 
+            background: var(--main-red); color: white; border: none; 
+            padding: 11px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .btn-apply:hover { transform: scale(1.05); }
+
+        /* Movie Grid */
+        .movie-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; 
+        }
+        .movie-card { 
+            background: white; border-radius: 20px; overflow: hidden; 
+            transition: 0.4s; position: relative; color: #333;
+        }
+        .movie-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+        .movie-card img { width: 100%; height: 330px; object-fit: cover; }
+        .movie-info { padding: 15px; text-align: center; }
+        .movie-info h4 { margin: 0 0 10px; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .add-fav-btn { 
+            display: block; background: var(--dark-blue); color: white; 
+            text-decoration: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 13px;
+        }
+
+        /* Pagination */
+        .pagination { text-align: center; margin: 60px 0; display: flex; justify-content: center; align-items: center; gap: 20px; }
+        .pagination a { 
+            background: white; color: var(--dark-blue); padding: 12px 25px; 
+            text-decoration: none; border-radius: 30px; font-weight: bold; transition: 0.3s;
+        }
+        .pagination a:hover { background: var(--main-red); color: white; }
+
+        /* Active states */
+        .active-tab { background: var(--main-red) !important; color: white !important; }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="logo">MOVLYX</a>
+        <div class="nav-links">
+            {% if session['username'] %}
+                <span>Welcome, <b>{{ session['username'] }}</b></span>
+                <a href="/favorites" class="fav-link">My List ❤️</a>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+                <a href="/signup" style="color: var(--main-red);">Join Now</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <header>
+        <h1>Movie Universe</h1>
+        <div style="margin-top: 20px;">
+            <a href="/?type=popular" class="btn {% if current_type == 'popular' and not cur_genre %}active-tab{% endif %}" style="color:white; text-decoration:none; padding:10px 20px; background:var(--glass); border-radius:20px; margin:5px; display:inline-block;">Popular</a>
+            <a href="/?type=top_rated" class="btn {% if current_type == 'top_rated' %}active-tab{% endif %}" style="color:white; text-decoration:none; padding:10px 20px; background:var(--glass); border-radius:20px; margin:5px; display:inline-block;">Top Rated</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="control-panel">
+            <form action="/" method="GET" class="search-form">
+                <input type="text" name="q" placeholder="Search movies, actors..." value="{{ query }}">
+                <button type="submit">Search</button>
+            </form>
+
+            <form action="/" method="GET" class="filters">
+                <div class="f-group">
+                    <label>Genre</label>
+                    <select name="genre">
+                        <option value="">All Genres</option>
+                        {% for genre in genres %}
+                            <option value="{{ genre.id }}" {% if cur_genre == genre.id|string %}selected{% endif %}>{{ genre.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="f-group">
+                    <label>Release Year</label>
+                    <input type="number" name="year" placeholder="2024" value="{{ cur_year }}" style="width: 80px;">
+                </div>
+
+                <div class="f-group">
+                    <label>Min. Rating</label>
+                    <input type="number" step="0.1" name="rating" placeholder="7.0" value="{{ cur_rating }}" style="width: 80px;">
+                </div>
+
+                <button type="submit" class="btn-apply">Apply Filters</button>
+                <a href="/" style="color:white; text-decoration:none; font-size:13px; opacity:0.7;">Reset</a>
+            </form>
+        </section>
+
+        <section class="movie-grid">
+            {% for movie in movies %}
+            <div class="movie-card">
+                <a href="/movie/{{ movie.id }}">
+                    {% if movie.poster_path %}
+                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                    {% else %}
+                        <div style="height:330px; background:#ccc; display:flex; align-items:center; justify-content:center;">No Image</div>
+                    {% endif %}
+                </a>
+                <div class="movie-info">
+                    <h4>{{ movie.title }}</h4>
+                    <a href="/add_favorite/{{ movie.id }}" class="add-fav-btn">Add Favorite ❤️</a>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <div class="pagination">
+            {% if current_page > 1 %}
+                <a href="/?type={{ current_type }}&genre={{ cur_genre }}&year={{ cur_year }}&rating={{ cur_rating }}&page={{ current_page - 1 }}&q={{ query }}">← Previous</a>
+            {% endif %}
+            
+            <span style="font-size: 20px; font-weight: bold; background: var(--main-red); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">{{ current_page }}</span>
+            
+            <a href="/?type={{ current_type }}&genre={{ cur_genre }}&year={{ cur_year }}&rating={{ cur_rating }}&page={{ current_page + 1 }}&q={{ query }}">Next →</a>
+        </div>
+    </main>
+
+</body>
+</html>

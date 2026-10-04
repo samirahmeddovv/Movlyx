@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favorites ❤️</title>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: linear-gradient(45deg, #032c56, #898787); 
+            min-height: 100vh; 
+            color: white; 
+        }
+        header { 
+            background-color: #0a2540; 
+            color: white; 
+            padding: 20px; 
+            text-align: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .container { 
+            max-width: 1100px; 
+            margin: 20px auto; 
+            padding: 20px; 
+        }
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .fav-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 25px; 
+        }
+        .fav-card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 15px; 
+            color: #333; 
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .fav-card img { 
+            width: 100%; 
+            border-radius: 10px; 
+            margin-bottom: 10px;
+        }
+        .fav-card h3 {
+            font-size: 16px;
+            margin: 10px 0;
+            height: 40px;
+            overflow: hidden;
+        }
+        .btn-remove { 
+            display: block; 
+            background: #d32f2f; 
+            color: white; 
+            padding: 10px; 
+            margin-top: 15px; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            transition: 0.3s;
+        }
+        .btn-remove:hover {
+            background: #b71c1c;
+            transform: scale(1.02);
+        }
+        .empty-msg {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>❤️ My Favorite Movies</h1>
+    </header>
+
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+
+        <div class="fav-grid">
+            {% for movie in fav_movies %}
+                <div class="fav-card">
+                    {% if movie[2] %}
+                        <img src="https://image.tmdb.org/t/p/w500{{ movie[2] }}" alt="{{ movie[1] }}">
+                    {% else %}
+                        <div style="height:300px; background:#ddd; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">No Image</div>
+                    {% endif %}
+                    
+                    <h3>{{ movie[1] }}</h3>
+                    
+                    <a href="/remove_favorite/{{ movie[0] }}" class="btn-remove">Remove from List 🗑️</a>
+                </div>
+            {% else %}
+                <div class="empty-msg">
+                    <p>No movies have been added to favorites yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
