@@ -126,9 +126,7 @@ def movie_details(movie_id):
 
     except Exception as e:
         print(f"Xəta baş verdi: {e}")
-        # Əgər API-də problem olsa belə, boş dəyişənlərlə səhifəni açmağa çalışırıq
-
-    # 7. İndi hamısını göndəririk. Yuxarıda yaratdığımız üçün "not defined" xətası verməyəcək.
+ 
     return render_template("details.html", 
                            movie=movie, 
                            cast=cast, 
