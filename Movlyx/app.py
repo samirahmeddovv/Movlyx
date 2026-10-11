@@ -4,7 +4,7 @@ import requests, oracledb
 app = Flask(__name__)
 app.secret_key = "movlyx_key"
 
-API_KEY = "09a1fbaff2d95589a99607645adce44d"
+API_KEY = "Your_API_key"
 BASE_URL = "https://api.themoviedb.org/3"
 
 def db_query(sql, params=None, fetch=False, commit=False):
@@ -13,7 +13,7 @@ def db_query(sql, params=None, fetch=False, commit=False):
     res = None
     try:
         
-        conn = oracledb.connect(user="samir1", password="12345", dsn="localhost/orcl")
+        conn = oracledb.connect(user="user", password="pass", dsn="localhost/orcl")
         cur = conn.cursor()
         
         if params:
